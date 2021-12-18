@@ -1,0 +1,81 @@
+
+
+
+
+html {
+  font-family: sans-serif;
+}
+
+body {
+  background-color: darkslategrey;
+
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 70px;
+  text-align: center;
+  color: burlywood;
+}
+
+p {
+  color: burlywood;
+  font-size: 30px;
+  text-align: center;
+}
+
+
+.submitForm {  
+  text-align: center;
+  font-size: 30px;
+  color: seashell;
+}
+.inpbox, .goalField {
+  width: 90px;
+  height: 41px;
+  vertical-align: middle;
+  border-radius: 16px;
+}
+.recbtn, .goalSubmit {
+  background-color: burlywood;
+  color: seashell;
+  width: 103px;
+  margin: 0 20px;
+  height: 36px;
+  border-radius: 30px;
+  vertical-align: middle;
+}
+
+
+.result {
+  text-align: center;
+  font-size: 25px;
+  color: seashell;
+}
+
+
+table, td {
+  text-align: center;
+  border: 1px solid seashell;
+  position: relative;
+  margin: 20px auto;
+  color: seashell;
+  font-size: 40px;
+}
+
+td {
+  width: 200px;
+  margin: auto;
+}
+
+#recinp {
+  text-align: center;
+}
+
+.inplbl {
+  display: inline-block;
+  width: 30px;
+  margin: 0 20px;
+  color: seashell;
+  font-size: 30px;
+}
