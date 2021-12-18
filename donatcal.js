@@ -136,6 +136,7 @@ function gameLoop() {
     // new game count placing
     gamecount += 1;
     document.querySelector("#gamecountP").innerHTML = "第" + gamecount + "局！請填寫分數：";
+    
     totalScore = 0;
   }
   else {
