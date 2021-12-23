@@ -13,7 +13,7 @@ body {
 }
 
 h1 {
-  font-size: 70px;
+  font-size: 50px;
   text-align: center;
   color: burlywood;
 }
@@ -31,7 +31,7 @@ p {
   color: seashell;
 }
 .inpbox, .goalField {
-  width: 90px;
+  width: 40px;
   height: 41px;
   vertical-align: middle;
   border-radius: 16px;
@@ -39,7 +39,7 @@ p {
 .recbtn, .goalSubmit {
   background-color: burlywood;
   color: seashell;
-  width: 103px;
+  width: 83px;
   margin: 0 20px;
   height: 36px;
   border-radius: 30px;
