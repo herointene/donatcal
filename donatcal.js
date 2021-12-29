@@ -1,27 +1,29 @@
 
 // initial players name
-let PP1 = "xi";
-let PP2 = "mi";
-let PP3 = "ni";
-let PP4 = "gi";
+//let PP1 = "xi";
+//let PP2 = "mi";
+//let PP3 = "ni";
+//let PP4 = "gi";
 
-const nameList = [PP1,PP2,PP3,PP4];
+const nameList = ['牛筋丸', '椰子雞', '毛血旺', '雞胸肉', '炸醬麵', '戰斧牛扒', '臭豆腐']
+let NAME = []
+//const nameList = [PP1,PP2,PP3,PP4];
 
 // constants
 const goalField = document.querySelector(".goalField");
 const goalSubmit = document.querySelector(".goalSubmit");
 const table = document.querySelector("#table");
-
+let goal = 0
 let gamecount = 1;
 let totalScore = 0;
 
-let scoreobj = {
-  'scoreP1':0,
-  'scoreP2':0,
-  'scoreP3':0,
-  'scoreP4':0,
-}
-  
+//let scoreobj = {
+//  'scoreP1':0,
+//  'scoreP2':0,
+ // 'scoreP3':0,
+ // 'scoreP4':0,
+//}
+let SCOREOBJ = []
 
 // let function works in submit button
 goalSubmit.addEventListener("click", initGametable);
@@ -29,16 +31,25 @@ goalSubmit.addEventListener("click", initGametable);
 function initGametable() {
 
   goal = Number(goalField.value); //global variant, no need let or var
+  const playersNum = Number(document.querySelector('#players').value);
+  NAME = [];
+  console.log(playersNum);
+  for (let i=0; i<playersNum; i++) {
+    NAME.push(nameList[i])
+  }
 
-
+  for (let k = 0; k < NAME.length; k++) {
+	SCOREOBJ.push(0)
+  }
+  
   // 表頭 即名字行
   let tableHead = table.createTHead();
   let nameRow = tableHead.insertRow(0);
-
-  for (let i = 0; i < nameList.length; i++) {
+  console.log(NAME);
+  for (let i = 0; i < NAME.length; i++) {
     let nameCell = nameRow.insertCell();
-    nameCell.setAttribute("id","player"+i);
-    nameCell.textContent = nameList[i];
+    nameCell.setAttribute("id","player"+(i+1));
+    nameCell.textContent = NAME[i];
 
   }
   // NextgameButton
@@ -65,7 +76,7 @@ function recordInput() {
   inputRow.appendChild(inputhead);
   document.body.appendChild(inputRow);
   // 4 input box
-  for (let i = 0; i < nameList.length; i++) {
+  for (let i = 0; i < NAME.length; i++) {
     let inputBox = document.createElement("input");
     inputBox.setAttribute("class","inpbox");
     inputBox.setAttribute("id","input"+(i+1));
@@ -75,7 +86,7 @@ function recordInput() {
     let inputLbl = document.createElement("label");
     inputLbl.setAttribute("class","inplbl");
     inputLbl.setAttribute("for","input"+(i+1));
-    let inpPN = document.createTextNode(nameList[i]);
+    let inpPN = document.createTextNode(NAME[i]);
     inputLbl.appendChild(inpPN);
 
     document.querySelector("#recinp").appendChild(inputLbl);
@@ -96,28 +107,32 @@ function recordInput() {
 // LOOP system
 
 function gameLoop() {
-  const inputP1 = Number(document.querySelector("#input1").value);
-  const inputP2 = Number(document.querySelector("#input2").value);
-  const inputP3 = Number(document.querySelector("#input3").value);
-  const inputP4 = Number(document.querySelector("#input4").value);
+//  const inputP1 = Number(document.querySelector("#input1").value);
+//  const inputP2 = Number(document.querySelector("#input2").value);
+//  const inputP3 = Number(document.querySelector("#input3").value);
+ // const inputP4 = Number(document.querySelector("#input4").value);
 
-  const iptscore = [inputP1,inputP2,inputP3,inputP4];
+ // const iptscore = [inputP1,inputP2,inputP3,inputP4];
 
+let  IPTSCORE = []
+
+  for (let k = 0; k < NAME.length; k++) {
+	  IPTSCORE.push(Number(document.querySelector('#input'+ (k+1).value)));
+    console.log(IPTSCORE[k]);
+  }
   // insert row
   let scorerow = table.insertRow(-1);
-  for (let i = 0; i < nameList.length; i++) {
+  for (let i = 0; i < NAME.length; i++) {
     let scoreCell = scorerow.insertCell(i);
     scoreCell.setAttribute("id","PS"+(i+1));
-    scoreobj["scoreP"+(i+1)] += iptscore[i];
-    scoreCell.innerHTML = scoreobj["scoreP"+(i+1)];
+    SCOREOBJ[i] += IPTSCORE[i];
+    scoreCell.innerHTML = SCOREOBJ[i];
 
   }
 
   // totalscore bar: 
-  for (let i = 0; i < nameList.length; i++){
-    totalScore += scoreobj["scoreP"+(i+1)];
-    console.log("P"+(i+1)+"score:"+scoreobj["scoreP"+(i+1)]);
-    console.log(totalScore);
+  for (let i = 0; i < NAME.length; i++){
+    totalScore += SCOREOBJ[i];
   }
 
   document.querySelector(".totalScore").innerHTML = "目前分數：" + totalScore ;
@@ -126,8 +141,8 @@ function gameLoop() {
   // compare goal and totalscore
   if (goal > totalScore) {
     // clear input box and focus on P1
-    oldscorearr = document.querySelectorAll(".inpbox");
-    for (let i = 0; i < nameList.length; i++){
+    let oldscorearr = document.querySelectorAll(".inpbox");
+    for (let i = 0; i < NAME.length; i++){
       oldscorearr[i].value = '';
     }
 
@@ -145,3 +160,5 @@ function gameLoop() {
   }
 
 }
+
+
