@@ -5,7 +5,7 @@
 //let PP3 = "ni";
 //let PP4 = "gi";
 
-const nameList = ['牛筋丸', '椰子雞', '毛血旺', '雞胸肉', '炸醬麵', '戰斧牛扒', '臭豆腐']
+const nameList = ['牛筋丸', '椰子雞', '毛血旺', '雞胸肉', '炸醬麵', '蒜蓉醬', '臭豆腐']
 let NAME = []
 //const nameList = [PP1,PP2,PP3,PP4];
 
@@ -75,7 +75,7 @@ function recordInput() {
   inputhead.appendChild(inputheadtext);
   inputRow.appendChild(inputhead);
   document.body.appendChild(inputRow);
-  // 4 input box
+  //  input box
   for (let i = 0; i < NAME.length; i++) {
     let inputBox = document.createElement("input");
     inputBox.setAttribute("class","inpbox");
@@ -88,9 +88,14 @@ function recordInput() {
     inputLbl.setAttribute("for","input"+(i+1));
     let inpPN = document.createTextNode(NAME[i]);
     inputLbl.appendChild(inpPN);
+    
+    let iptForm = document.createElement("div");
+    iptForm.setAttribute("class","iptForm");
+    iptForm.setAttribute("id","ipt"+(i+1));
+    document.querySelector("#recinp").appendChild(iptForm);
+    document.querySelector("#ipt"+(i+1)).appendChild(inputLbl);
+    document.querySelector("#ipt"+(i+1)).appendChild(inputBox);
 
-    document.querySelector("#recinp").appendChild(inputLbl);
-    document.querySelector("#recinp").appendChild(inputBox);
   }
   // submit button
   let recbtn = document.createElement("input");
