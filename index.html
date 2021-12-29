@@ -16,13 +16,20 @@
     <h1>Donatcal分數計算器</h1>
 
     <p>
-        分數捐獻系統：為目標而戰！
+        一個加總計算器
     </p>
     <div class="result">
     <span class="goal"></span>
     <span class="totalScore"></span>
     </div>
     <div class="submitForm">
+      <label for=“players”>選擇人數</label>
+      <select name="players" id="players">
+        <option value='4'>4</option>
+        <option value='5'>5</option>
+        <option value='6'>6</option>
+        <option value='7'>7</option>
+      </select>
       <label for="goalField">鍵入目標值</label>
       <input type="number" id="goalField" class="goalField" pattern="[0-9]*">
       <input type="submit" value="提交" class="goalSubmit">
@@ -38,3 +45,4 @@
     <script src="donatcal.js"></script>
   </body>
 </html>
+
