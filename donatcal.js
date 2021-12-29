@@ -117,7 +117,7 @@ function gameLoop() {
 let  IPTSCORE = []
 
   for (let k = 0; k < NAME.length; k++) {
-	  IPTSCORE.push(Number(document.querySelector('#input'+ (k+1).value)));
+    IPTSCORE.push(Number(document.querySelector('#input'+ (k+1)).value));
     console.log(IPTSCORE[k]);
   }
   // insert row
