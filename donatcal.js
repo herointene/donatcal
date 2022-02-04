@@ -5,7 +5,7 @@
 //let PP3 = "ni";
 //let PP4 = "gi";
 
-const nameList = ['牛筋丸', '椰子雞', '毛血旺', '雞胸肉', '炸醬麵', '蒜蓉醬', '臭豆腐']
+const nameList = ['恭', '喜', '發', '財', '炸醬麵', '蒜蓉醬', '臭豆腐']
 let NAME = []
 //const nameList = [PP1,PP2,PP3,PP4];
 
