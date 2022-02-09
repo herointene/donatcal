@@ -30,17 +30,19 @@
         <!-- row: seprate with score table -->
         <!-- col-md-4: seprate with chart canvas -->
         <div class="col-md-4"> 
-          <!-- initial form row: seprate with outside-form space -->
-          <div class="shadow-lg row bg-light">
+          <!-- initial form box row: seprate with outside-form space -->
+          <div id="initFormBox" class="shadow-lg rounded row bg-light">
             <!-- collapse btn col -->
-            <div class="col-4">
-              <button type="button" class="btn" data-bs-toggle="collapse" data-bs-target="#initForm">初始設置</button>
+            <div class="row py-2">
+              <div class="col-6">
+                <button type="button" class="shadow-sm btn rounded" data-bs-toggle="collapse" data-bs-target="#initForm">初始設定</button>
+              </div>
             </div>
+
             <section id="initForm" :class="{'collapse':!initActive}"> 
-              <div class="row">
+              <div class="row mb-3">
                 <!-- row: seprate with submit btn -->
                 <div class="col-6">
-                  <div class="mb-3">
                     <label for="playersNum" class="form-label">選擇人數:</label>
                     <select class="form-select" :disabled="!initActive" v-model="playersNum" name="playersNum" id="playersNum" placeholder="">
                       <option value="2">2</option>
@@ -50,29 +52,54 @@
                       <option value="6">6</option>
                       <option value="7">7</option>
                       <option value="8">8</option>
-                    </select>
-                  </div> 
+                    </select> 
                   <!-- playersNum selection END  -->
                 </div>
                 <!-- col-6 END -->
                 <!-- input target -->
                 <div class="col-6">
-                  <div class="mb-3">
                     <label for="tgip" class="form-label">請輸入目標值:</label>
                     <input type="number" :disabled="!initActive" v-model="target" class="form-control" name="tgip" id="tgip" pattern="[0-9]*" aria-describedby="tgipHelp" placeholder="">
                     <small id="tgipHelp" class="form-text text-muted">分數達到目標值將結束流程</small>
-                  </div>
                 </div>
               </div>
-              <div class="d-grid">
-                <button type="submit" class="btn btn-primary mb-2" :disabled="!initActive">提交</button>
+
+              <div class="row">
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary mb-2" :disabled="!initActive">提交</button>
+                </div>
               </div>
               <!-- Initial Form END -->
             </section>
           </div>
-          <section id="scip">
 
-          </section>
+          <div id="scoreInputBox" class="shadow-lg rounded row bg-light mt-3">
+            <!-- collapse btn col -->
+            <div class="row py-2">
+              <div class="col-6">
+                <button type="button" class="shadow-sm btn rounded" data-bs-toggle="collapse" data-bs-target="#scip">錄入分數</button>
+              </div>
+            </div>
+
+            <section id="scip" :class="{'collapse':initActive}">
+              <div id="iterableScoreForm" >
+                <div v-for="(item, index) in playersNum" :key="index" class="row mb-3">
+
+                    <label :for="'player' + item" class="col-8 col-form-label" >{{player.name</label>
+                    <div class="col-4">
+                      <input type="number" class="form-control" :id="'player' + item" pattern="[0-9]*">
+                    </div>
+
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary mb-2">錄入</button>
+                </div>
+              </div>
+            </section>
+          </div>
         </div>
         <div class="col-md-8">
           <p>8.Chart.js</p>
@@ -117,13 +144,12 @@
     const app = Vue.createApp({
       data() {
         return {
-          playersNum: 2,
+          playersNum:2,
           score:0,
           target: 100,
           initActive:true
         }
       },
-
       methods: {
         
       },
