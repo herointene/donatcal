@@ -17,7 +17,7 @@
   </div>
 
   <div id="app" class="container-fluid">
-    <div class="shadow row bg-primary text-center">
+    <div class="shadow row bg-secondary text-light text-center">
       <div class="col-md-6">
         <h2>目標分數：{{target}}</h2>
       </div>
@@ -35,23 +35,19 @@
             <!-- collapse btn col -->
             <div class="row py-2">
               <div class="col-6">
-                <button type="button" class="shadow-sm btn rounded" data-bs-toggle="collapse" data-bs-target="#initForm">初始設定</button>
+                <button id="initBtn" type="button" class="shadow-sm btn rounded" data-bs-toggle="collapse" data-bs-target="#initForm">初始設定</button>
               </div>
             </div>
 
-            <section id="initForm" :class="{'collapse':!initActive}"> 
+            <section id="initForm" class="collapse show"> 
               <div class="row mb-3">
                 <!-- row: seprate with submit btn -->
                 <div class="col-6">
                     <label for="playersNum" class="form-label">選擇人數:</label>
                     <select class="form-select" :disabled="!initActive" v-model="playersNum" name="playersNum" id="playersNum" placeholder="">
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                      <option value="4">4</option>
-                      <option value="5">5</option>
-                      <option value="6">6</option>
-                      <option value="7">7</option>
-                      <option value="8">8</option>
+                      
+                        <option v-for="player in players" :value="player.id"> {{player.id}} </option>
+
                     </select> 
                   <!-- playersNum selection END  -->
                 </div>
@@ -66,36 +62,46 @@
 
               <div class="row">
                 <div class="d-grid">
-                  <button type="submit" class="btn btn-primary mb-2" :disabled="!initActive">提交</button>
+                  <button type="submit" class="btn btn-primary mb-2" @click="initSubmit" :disabled="!initActive">提交</button>
                 </div>
               </div>
               <!-- Initial Form END -->
             </section>
           </div>
 
+          <!-- scip box START: -->
           <div id="scoreInputBox" class="shadow-lg rounded row bg-light mt-3">
             <!-- collapse btn col -->
             <div class="row py-2">
               <div class="col-6">
-                <button type="button" class="shadow-sm btn rounded" data-bs-toggle="collapse" data-bs-target="#scip">錄入分數</button>
+                <button id="scipBtn" type="button" class="shadow-sm btn rounded" data-bs-toggle="collapse" data-bs-target="#scip">錄入分數</button>
               </div>
             </div>
 
-            <section id="scip" :class="{'collapse':initActive}">
+            <section id="scip" class="collapse">
               <div id="iterableScoreForm" >
-                <div v-for="(item, index) in playersNum" :key="index" class="row mb-3">
-
-                    <label :for="'player' + item" class="col-8 col-form-label" >{{player.name</label>
-                    <div class="col-4">
-                      <input type="number" class="form-control" :id="'player' + item" pattern="[0-9]*">
+                <template v-if="initActive==false">
+                  <!-- Game Count area -->
+                  <div id="gameCountArea" class="row">
+                    <div class="text-center">
+                      <h5>第 {{game}} 局</h5>
                     </div>
+                  </div>
+                  <div v-for="player in players" :key="player.id" class="row mb-3">
 
-                </div>
+                      <label :for="'g'+game+'-'+player.name" class="col-8 col-form-label text" >{{player.name}}</label>
+                      <div class="col-4">
+                        <input type="number" class="form-control" :id="'g'+game+'-'+player.name" v-model="player.currentScore" pattern="[0-9]*">
+                      </div>
+                      <!-- iteration END -->
+
+                  </div>
+                </template>
               </div>
 
               <div class="row">
                 <div class="d-grid">
-                  <button type="submit" class="btn btn-primary mb-2">錄入</button>
+                  <button type="submit" @click="scoreSubmit" :disabled="initActive" class="btn btn-primary mb-2">錄入</button>
                 </div>
               </div>
             </section>
@@ -147,12 +153,102 @@
           playersNum:2,
           score:0,
           target: 100,
-          initActive:true
-        }
-      },
-      methods: {
+          initActive:true,
+          game:1,
+          // We have a maximum 8 players, generating players default dataset:
+          players: [
+            {
+              id:1,
+              name:'player-1',
+              borderColor: 'red',
+              score: [],
+              currentScore: 0,
+          },
+            {
+              id:2,
+              name:'player-2',
+              borderColor: 'red',
+              score: [],
+              currentScore: 0,
+          },
+            {
+              id:3,
+              name:'player-3',
+              borderColor: 'red',
+              score: [],
+              currentScore: 0,
+          },
+            {
+              id:4,
+              name:'player-4',
+              borderColor: 'red',
+              score: [],
+              currentScore: 0,
+          },
+            {
+              id:5,
+              name:'player-5',
+              borderColor: 'red',
+              score: [],
+              currentScore: 0,
+          },
+            {
+              id:6,
+              name:'player-6',
+              borderColor: 'red',
+              score: [],
+              currentScore: 0,
+          },
+            {
+              id:7,
+              name:'player-7',
+              borderColor: 'red',
+              score: [],
+              currentScore: 0,
+          },
+            {
+              id:8,
+              name:'player-8',
+              borderColor: 'red',
+              score: [],
+              currentScore: 0,
+          }],
+          
         
+      };
+    },
+
+    methods: {
+      initSubmit(){
+        this.players = this.players.slice(0,this.playersNum);
+        document.querySelector('#initBtn').click();
+        this.initActive = false;  
+        setTimeout(() => {
+          document.querySelector('#scipBtn').click();
+        }, 200);
       },
+    
+      scoreSubmit(){
+
+
+
+
+
+
+        // clear current score, go to next loop
+        this.players.forEach(player => {
+          const scoreTemplate = {'game':this.game,'score':player.currentScore};
+          player.score.push(scoreTemplate);
+          
+          player.currentScore = 0;          
+        });
+
+        this.game++;
+      }
+
+
+
+    },
     }).mount('#app')
   </script>
 </body>
