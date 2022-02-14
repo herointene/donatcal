@@ -66,7 +66,7 @@
 
               <div class="row">
                 <div class="d-grid">
-                  <button type="submit" class="btn btn-primary mb-2" @click="initSubmit" :disabled="!initActive">提交</button>
+                  <button type="submit" id="initSubmit" class="btn btn-primary mb-2" @click="initSubmit" :disabled="!initActive">提交</button>
                 </div>
               </div>
               <!-- Initial Form END -->
@@ -130,18 +130,18 @@
       <div class="row shadow-lg rounded bg-light my-4">
         <div class="col overflow-auto">
           Table
-          <table class="table " v-if="initActive == false">
+          <table class="table text-center " v-if="initActive == false">
             <thead>
               <tr>
                 <th>局數</th>
-                <th v-for="player in players" class="text-center" :key="player.id">
+                <th v-for="player in players" class="" :key="player.id">
                   {{player.name}}
                   <p>{{getSum(player.id)}}</p>
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(i,index) in game" :key="index" class="text-center">
+              <tr v-for="(i,index) in game" :key="index" class="">
                 <th scope="row">{{i}}</th>
                 <td v-for="player in players" :key="player.id">{{getScore(player.id,i)}}</td>
               </tr>
@@ -178,68 +178,78 @@
       };
     },
     computed: {
-      chartData(){
-        gameNumLabel = _.range(this.game);
-        //create dataset object
-        let cDatasets = [];
-        this.players.forEach(player => {
-          playerCData = {
-            label: player.name,
-            data: player.score,
-            fill: false,
-            borderColor: player.borderColor,
-          }
-          cDatasets.push(playerCData);
-        });
-        // add to vue data
-        const chartData = {
-          type: "line",
-          data: {
-            label: gameNumLabel,
-            datasets: cDatasets,
-          },
-          options: {},
-          plugins: []
-        };
-        return chartData
+      // chartData(){
+      //   gameNumLabel = _.range(this.game);
+      //   //create dataset object
+      //   let cDatasets = [];
+      //   this.players.forEach(player => {
+      //     playerCData = {
+      //       label: player.name,
+      //       data: player.score,
+      //       fill: false,
+      //       borderColor: player.borderColor,
+      //     }
+      //     cDatasets.push(playerCData);
+      //   });
+      //   // add to vue data
+      //   const chartData = {
+      //     type: "line",
+      //     data: {
+      //       labels: gameNumLabel,
+      //       datasets: cDatasets,
+      //     },
+      //     options: {},
+      //     plugins: []
+      //   };
+      //   return chartData
 
-      }
+      // }
     },
 
+    // mounted(){
+    //   chartData = this.chartData;
+    //   chart = new Chart('lineChart',chartData);
+    // },
 
     methods: {
       initSubmit(){
         this.game ++;
-        genPlayers = [];
         for (let i = 0; i < this.playersNum; i++) {
-          const rawPlayers = {
+          const rawPlayer = {
           id: i ,
           name:'player-' + i,
           borderColor: "#" + ('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6), //random color generator
           score: [],
           currentScore: 0,
           };
-        genPlayers.push(rawPlayers)
+          this.players.push(rawPlayer);
         };
-        this.players = genPlayers;
 
         document.querySelector('#initBtn').click();
         this.initActive = false;  
         setTimeout(() => {
           document.querySelector('#scipBtn').click(); //prettify collapse animation
         }, 200);
+
+
+
       },
     
       scoreSubmit(){
         // clear current score, go to next loop
         this.players.forEach(player => {
           player.score.push(player.currentScore);
+          this.score += player.currentScore;
+          // copyscore = _.cloneDeep(player.score);   
+          chart.data.datasets[player.id].data.push(this.getSum(player.id));
           player.currentScore = 0;          
         });
+        // chart.data.datasets = this.chartData.data.datasets;
+        copygame = _.cloneDeep(app.game);
+        gameNumLabel = _.range(copygame);
+        chart.data.labels = gameNumLabel;
+        chart.update();
         this.game++;
-        // console.log(drawChart)
-        // drawChart.data = this.chartData;
-        // drawChart.update() ;
       },
 
       getScore(player,i){
@@ -254,7 +264,36 @@
     },
     }).mount('#app');
 
-
+    initSubmit.addEventListener("click",()=>{
+      copygame = _.cloneDeep(app.game);
+      gameNumLabel = _.range(copygame);
+      //create dataset object
+      let cDatasets = [];
+      copyplayers = _.cloneDeep(app.players);
+      copyplayers.forEach(player => {
+        playerCData = {
+          label: player.name,
+          data: player.score,
+          fill: true,
+          borderColor: player.borderColor,
+          backgroundColor: player.borderColor,
+        }
+        cDatasets.push(playerCData);
+      });
+      // add to vue data
+      const chartData = {
+        type: "line",
+        data: {
+          labels: gameNumLabel,
+          datasets: cDatasets,
+        },
+        options: {},
+        plugins: []
+      };
+      chart = new Chart('lineChart',chartData);
+    })
+      
+    
 
 
   </script>
