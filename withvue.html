@@ -271,7 +271,7 @@
     }).mount('#app');
 
     initSubmit.addEventListener("click",()=>{
-      gameNumLabel = app.getChartLabels();
+      gameNumLabel = getChartLabels();
       //create dataset object IMMIGRATE THIS TO MOUNTED __ ADD WATCH AND COMPUTED CONFIG IN VUE
       let cDatasets = [];
       copyplayers = _.cloneDeep(app.players);
