@@ -85,7 +85,7 @@
                     <!-- 局數顯示 -->
                     <div id="gameCountArea" class="row">
                       <div class="text-center">
-                        <h5>第 {{ game }} 局</h5>
+                        <h5>第 {{ Math.max(1, game) }} 局</h5>
                       </div>
                     </div>
                     
@@ -143,7 +143,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="round in game - 1" :key="round">
+                <tr v-for="round in Math.max(0, game - 1)" :key="round">
                   <th scope="row">{{ round }}</th>
                   <td v-for="player in players" :key="player.id">{{ getScore(player.id, round) }}</td>
                 </tr>
@@ -180,18 +180,20 @@
       },
 
       computed: {
-        chartData() {
-          if (this.players.length === 0) return null;
+        chartConfig() {
+          if (this.players.length === 0 || this.game <= 1) return null;
           
           const gameNumLabel = _.range(1, this.game);
           const datasets = this.players.map(player => ({
-            label: player.name,
+            label: player.name || `玩家${player.id + 1}`,
             data: this.getPlayerChartData(player.id),
             fill: false,
-            borderColor: player.borderColor,
-            backgroundColor: player.borderColor + '20',
+            borderColor: player.borderColor || '#000000',
+            backgroundColor: (player.borderColor || '#000000') + '20',
             tension: 0.3
-          }));
+          })).filter(dataset => dataset.data && dataset.data.length > 0);
+
+          if (datasets.length === 0) return null;
 
           return {
             type: 'line',
@@ -281,10 +283,10 @@
         },
 
         initChart() {
-          if (this.chartData) {
+          if (this.chartConfig) {
             const ctx = document.getElementById('lineChart');
             if (ctx) {
-              this.chart = new Chart(ctx, this.chartData);
+              this.chart = new Chart(ctx.getContext('2d'), this.chartConfig);
             }
           }
         },
@@ -312,8 +314,8 @@
               this.chart.data.datasets[index].borderColor = player.borderColor;
             });
             
-            this.chart.data.labels = _.range(1, this.game + 1);
-            this.chart.update('none');
+            this.chart.data.labels = _.range(1, this.game);
+            this.chart.update();
           }
 
           this.game++;
@@ -348,22 +350,22 @@
 
         getScore(playerId, round) {
           const player = this.players.find(p => p.id === playerId);
-          return player ? player.score[round - 1] || 0 : 0;
+          return player && player.score ? player.score[round - 1] || 0 : 0;
         },
 
         getSum(playerId) {
           const player = this.players.find(p => p.id === playerId);
-          return player ? _.sum(player.score) : 0;
+          return player && player.score ? _.sum(player.score) : 0;
         },
 
         getPlayerChartData(playerId) {
           const player = this.players.find(p => p.id === playerId);
-          if (!player) return [];
+          if (!player || !player.score) return [];
           
           const cumulativeScores = [];
           let sum = 0;
           for (let score of player.score) {
-            sum += score;
+            sum += Number(score) || 0;
             cumulativeScores.push(sum);
           }
           return cumulativeScores;
