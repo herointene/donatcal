@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,9 +9,10 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 </head>
+
 <body class="d-flex flex-column h-100">
   <main class="flex-shrink-0">
     <div class="container-fluid bg-success">
@@ -22,14 +24,19 @@
 
     <div id="app" class="container-fluid">
       <div class="shadow row bg-secondary text-light text-center">
-        <div class="col-md-6">
-          <h2>目標分數：{{ target }}</h2>
+        <div class="col-md-4">
+          <h2 v-if="target > 0">目標分數：{{ target }}</h2>
+          <h2 v-else-if="targetRounds > 0">目標局數：{{ targetRounds }}</h2>
         </div>
-        <div class="col-md-6">
-          <h2>當前分數：{{ score }}</h2>
+        <div class="col-md-4">
+          <h2 v-if="target > 0">當前分數：{{ score }}</h2>
+          <h2 v-else-if="targetRounds > 0">當前局數：{{ game - 1 }}</h2>
+        </div>
+        <div class="col-md-4">
+          <h2>遊戲狀態：{{ target > 0 ? '目標分數' : (targetRounds > 0 ? '目標局數' : '未設定') }}</h2>
         </div>
       </div>
-      
+
       <div class="container">
         <div class="row mt-4">
           <!-- 左側控制面板 -->
@@ -38,7 +45,8 @@
             <div id="initFormBox" class="shadow-lg rounded row bg-light">
               <div class="row py-2">
                 <div class="col-12">
-                  <button id="initBtn" type="button" class="shadow-sm btn rounded" data-bs-toggle="collapse" data-bs-target="#initForm">
+                  <button id="initBtn" type="button" class="shadow-sm btn rounded" data-bs-toggle="collapse"
+                    data-bs-target="#initForm">
                     初始設定
                   </button>
                 </div>
@@ -48,20 +56,45 @@
                 <div class="row mb-3">
                   <div class="col-6">
                     <label for="playersNum" class="form-label">選擇人數:</label>
-                    <select class="form-select" :disabled="!initActive" v-model.number="playersNum" name="playersNum" id="playersNum">
+                    <select class="form-select" :disabled="!initActive" v-model.number="playersNum" name="playersNum"
+                      id="playersNum">
                       <option v-for="i in maxPlayers" :key="i" :value="i">{{ i }}</option>
                     </select>
                   </div>
                   <div class="col-6">
-                    <label for="tgip" class="form-label">請輸入目標值:</label>
-                    <input type="number" :disabled="!initActive" v-model.number="target" class="form-control" name="tgip" id="tgip" pattern="[0-9]*" aria-describedby="tgipHelp" placeholder="">
-                    <small id="tgipHelp" class="form-text text-muted">分數達到目標值將結束流程</small>
+                    <label for="tgip" class="form-label">目標分數:</label>
+                    <input type="number" :disabled="!initActive || targetRounds > 0" v-model.number="target"
+                      class="form-control" name="tgip" id="tgip" pattern="[0-9]*" aria-describedby="tgipHelp"
+                      placeholder="">
+                    <small id="tgipHelp" class="form-text text-muted">分數達到目標值將結束流程 (與目標局數互斥)</small>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-6">
+                    <label for="rounds" class="form-label">目標局數:</label>
+                    <input type="number" :disabled="!initActive || target > 0" v-model.number="targetRounds"
+                      class="form-control" name="rounds" id="rounds" pattern="[0-9]*" min="1" placeholder="">
+                    <small id="roundsHelp" class="form-text text-muted">局數達到目標值將結束流程 (與目標分數互斥)</small>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">獲勝條件:</label>
+                    <div class="btn-group w-100" role="group" aria-label="獲勝條件">
+                      <input type="radio" class="btn-check" name="winCondition" id="highScore" :disabled="!initActive"
+                        v-model="highScoreWins" :value="true">
+                      <label class="btn btn-outline-primary" for="highScore">高分獲勝</label>
+
+                      <input type="radio" class="btn-check" name="winCondition" id="lowScore" :disabled="!initActive"
+                        v-model="highScoreWins" :value="false">
+                      <label class="btn btn-outline-primary" for="lowScore">低分獲勝</label>
+                    </div>
+                    <small class="form-text text-muted">選擇遊戲結束時的獲勝條件</small>
                   </div>
                 </div>
 
                 <div class="row">
                   <div class="d-grid">
-                    <button type="submit" id="initSubmit" class="btn btn-primary mb-2" @click="initSubmit" :disabled="!initActive">
+                    <button type="submit" id="initSubmit" class="btn btn-primary mb-2" @click="initSubmit"
+                      :disabled="!initActive">
                       提交
                     </button>
                   </div>
@@ -73,7 +106,8 @@
             <div id="scoreInputBox" class="shadow-lg rounded row bg-light mt-3">
               <div class="row py-2">
                 <div class="col-12">
-                  <button id="scipBtn" type="button" class="shadow-sm btn rounded" data-bs-toggle="collapse" data-bs-target="#scip">
+                  <button id="scipBtn" type="button" class="shadow-sm btn rounded" data-bs-toggle="collapse"
+                    data-bs-target="#scip">
                     錄入分數
                   </button>
                 </div>
@@ -88,23 +122,27 @@
                         <h5>第 {{ Math.max(1, game) }} 局</h5>
                       </div>
                     </div>
-                    
+
                     <!-- 玩家分數輸入 -->
                     <div v-for="player in players" :key="player.id" class="row mb-3 align-items-center">
                       <div class="col-2">
-                        <input type="color" class="form-control form-control-color" v-model="player.borderColor" :disabled="initActive">
+                        <input type="color" class="form-control form-control-color" v-model="player.borderColor"
+                          :disabled="initActive">
                       </div>
                       <div class="col-1 text-end">
-                        <button class="btn btn-sm btn-outline-secondary" type="button" @click="toggleEditName(player.id)">
+                        <button class="btn btn-sm" type="button" @click="toggleEditName(player.id)">
                           ✏️
                         </button>
                       </div>
                       <div v-if="editingPlayerId === player.id" class="col-5">
-                        <input type="text" v-model="player.name" class="form-control" @blur="finishEditName" @keyup.enter="finishEditName">
+                        <input type="text" v-model="player.name" class="form-control" @blur="finishEditName"
+                          @keyup.enter="finishEditName">
                       </div>
-                      <label v-else :for="'g'+game+'-'+player.name" class="col-5 col-form-label">{{ player.name }}</label>
+                      <label v-else :for="'g'+game+'-'+player.name" class="col-5 col-form-label">{{ player.name
+                        }}</label>
                       <div class="col-4">
-                        <input type="number" class="form-control" :id="'g'+game+'-'+player.name" v-model.number="player.currentScore" pattern="[0-9]*" min="0">
+                        <input type="number" class="form-control" :id="'g'+game+'-'+player.name"
+                          v-model.number="player.currentScore" pattern="[0-9]*" min="0">
                       </div>
                     </div>
                   </template>
@@ -112,7 +150,8 @@
 
                 <div class="row">
                   <div class="d-grid">
-                    <button id="scsm" type="submit" @click="scoreSubmit" :disabled="initActive" class="btn btn-primary mb-2">
+                    <button id="scsm" type="submit" @click="scoreSubmit" :disabled="initActive"
+                      class="btn btn-primary mb-2">
                       錄入
                     </button>
                   </div>
@@ -124,7 +163,7 @@
           <!-- 右側圖表區域 -->
           <div class="col-md-8 my-4">
             <div class="shadow-lg rounded bg-light text-center">
-              <canvas id="lineChart" style="width: 100%; height: 600px;"></canvas>
+              <div id="lineChart" style="width: 100%; height: 600px;"></div>
             </div>
           </div>
         </div>
@@ -163,14 +202,16 @@
 
   <script>
     const { createApp } = Vue;
-    
+
     createApp({
       data() {
         return {
           playersNum: 2,
           maxPlayers: 8,
           score: 0,
-          target: 100,
+          target: 0,
+          targetRounds: 0,
+          highScoreWins: true,
           initActive: true,
           game: 0,
           editingPlayerId: null,
@@ -180,60 +221,59 @@
       },
 
       computed: {
-        chartConfig() {
-          if (this.players.length === 0 || this.game <= 1) return null;
-          
-          const gameNumLabel = _.range(1, this.game);
-          const datasets = this.players.map(player => ({
-            label: player.name || `玩家${player.id + 1}`,
-            data: this.getPlayerChartData(player.id),
-            fill: false,
-            borderColor: player.borderColor || '#000000',
-            backgroundColor: (player.borderColor || '#000000') + '20',
-            tension: 0.3
-          })).filter(dataset => dataset.data && dataset.data.length > 0);
+        echartsOption() {
+          if (this.players.length === 0 || this.game <= 0) return null;
 
-          if (datasets.length === 0) return null;
+          const gameNumLabel = _.range(1, this.game + 1);
+          const series = this.players.map(player => ({
+            name: player.name || `玩家${player.id + 1}`,
+            type: 'line',
+            data: this.getPlayerChartData(player.id),
+            smooth: true,
+            lineStyle: {
+              color: player.borderColor || '#000000',
+              width: 2
+            },
+            itemStyle: {
+              color: player.borderColor || '#000000'
+            }
+          })).filter(series => series.data && series.data.length > 0);
+
+          if (series.length === 0) return null;
 
           return {
-            type: 'line',
-            data: {
-              labels: gameNumLabel,
-              datasets: datasets
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                title: {
-                  display: true,
-                  text: '時局圖',
-                  font: { size: 20 }
-                },
-                legend: {
-                  display: true,
-                  position: 'top'
-                }
-              },
-              scales: {
-                x: {
-                  title: {
-                    display: true,
-                    text: '局數'
-                  }
-                },
-                y: {
-                  title: {
-                    display: true,
-                    text: '分數'
-                  },
-                  suggestedMin: 0,
-                  ticks: {
-                    stepSize: 5
-                  }
-                }
+            title: {
+              text: '時局圖',
+              left: 'center',
+              textStyle: {
+                fontSize: 20
               }
-            }
+            },
+            tooltip: {
+              trigger: 'axis'
+            },
+            legend: {
+              top: 30,
+              data: series.map(s => s.name)
+            },
+            grid: {
+              left: '3%',
+              right: '4%',
+              bottom: '3%',
+              containLabel: true
+            },
+            xAxis: {
+              type: 'category',
+              name: '局數',
+              data: gameNumLabel,
+              boundaryGap: false
+            },
+            yAxis: {
+              type: 'value',
+              name: '分數',
+              min: 0
+            },
+            series: series
           };
         }
       },
@@ -244,15 +284,21 @@
             alert('請選擇有效的人數（1-8人）');
             return;
           }
-          
-          if (this.target <= 0) {
-            alert('請輸入有效的目標分數');
+
+          // 驗證目標輸入互斥性
+          if (this.target <= 0 && this.targetRounds <= 0) {
+            alert('請輸入有效的目標分數或目標局數');
+            return;
+          }
+
+          if (this.target > 0 && this.targetRounds > 0) {
+            alert('目標分數和目標局數只能選擇一個');
             return;
           }
 
           this.game = 1;
           this.players = [];
-          
+
           for (let i = 0; i < this.playersNum; i++) {
             const rawPlayer = {
               id: i,
@@ -267,26 +313,24 @@
           // 關閉初始設定面板
           const initBtn = document.querySelector('#initBtn');
           if (initBtn) initBtn.click();
-          
+
           this.initActive = false;
-          
+
           // 自動打開分數輸入面板
           setTimeout(() => {
             const scipBtn = document.querySelector('#scipBtn');
             if (scipBtn) scipBtn.click();
           }, 200);
 
-          // 初始化圖表
-          this.$nextTick(() => {
-            this.initChart();
-          });
+          // 初始化圖表 - 延遲到第一次錄入時再初始化
         },
 
         initChart() {
-          if (this.chartConfig) {
-            const ctx = document.getElementById('lineChart');
-            if (ctx) {
-              this.chart = new Chart(ctx.getContext('2d'), this.chartConfig);
+          const chartDom = document.getElementById('lineChart');
+          if (chartDom) {
+            this.chart = echarts.init(chartDom);
+            if (this.echartsOption) {
+              this.chart.setOption(this.echartsOption);
             }
           }
         },
@@ -305,20 +349,19 @@
           });
 
           this.score += roundTotal;
-          
-          // 更新圖表
-          if (this.chart) {
-            this.players.forEach((player, index) => {
-              this.chart.data.datasets[index].data = this.getPlayerChartData(player.id);
-              this.chart.data.datasets[index].label = player.name;
-              this.chart.data.datasets[index].borderColor = player.borderColor;
-            });
-            
-            this.chart.data.labels = _.range(1, this.game);
-            this.chart.update();
-          }
 
           this.game++;
+
+          // 更新圖表
+          this.$nextTick(() => {
+            if (this.chart) {
+              if (this.echartsOption) {
+                this.chart.setOption(this.echartsOption);
+              }
+            } else if (!this.chart) {
+              this.initChart();
+            }
+          });
 
           // 檢查是否達到目標
           if (this.checkGameEnd()) {
@@ -327,23 +370,69 @@
         },
 
         validateCurrentScores() {
-          return this.players.every(player => 
+          return this.players.every(player =>
             player.currentScore >= 0 && !isNaN(player.currentScore)
           );
         },
 
         checkGameEnd() {
-          return this.players.some(player => this.getSum(player.id) >= this.target);
+          if (this.target > 0) {
+            return this.players.some(player => this.getSum(player.id) >= this.target);
+          } else if (this.targetRounds > 0) {
+            return this.game > this.targetRounds;
+          }
+          return false;
         },
 
         handleGameEnd() {
-          const winner = this.players.find(player => 
-            this.getSum(player.id) >= this.target
-          );
-          
+          let winner = null;
+          let message = '';
+
+          if (this.target > 0) {
+            if (this.highScoreWins) {
+              winner = this.players.find(player =>
+                this.getSum(player.id) >= this.target
+              );
+            } else {
+              winner = this.players.find(player =>
+                this.getSum(player.id) <= this.target
+              );
+            }
+            if (winner) {
+              message = `恭喜 ${winner.name} 獲得勝利！\n最終分數：${this.getSum(winner.id)}`;
+            }
+          } else if (this.targetRounds > 0) {
+            // 目標局數模式：根據獲勝條件決定勝者
+            const scores = this.players.map(player => ({
+              player,
+              total: this.getSum(player.id)
+            }));
+
+            if (this.highScoreWins) {
+              scores.sort((a, b) => b.total - a.total);
+              winner = scores[0].player;
+              message = `遊戲結束！總共進行了 ${this.targetRounds} 局\n`;
+              message += `恭喜 ${winner.name} 獲得最終勝利！\n最終分數：${scores[0].total}`;
+            } else {
+              scores.sort((a, b) => a.total - b.total);
+              winner = scores[0].player;
+              message = `遊戲結束！總共進行了 ${this.targetRounds} 局\n`;
+              message += `恭喜 ${winner.name} 獲得最終勝利！\n最低分數：${scores[0].total}`;
+            }
+
+            // 顯示所有玩家最終分數
+            message += '\n\n最終排名：';
+            scores.forEach((item, index) => {
+              const rank = this.highScoreWins ?
+                `${index + 1}. ${item.player.name}: ${item.total}分` :
+                `${index + 1}. ${item.player.name}: ${item.total}分`;
+              message += `\n${rank}`;
+            });
+          }
+
           if (winner) {
             setTimeout(() => {
-              alert(`恭喜 ${winner.name} 獲得勝利！\n最終分數：${this.getSum(winner.id)}`);
+              alert(message);
             }, 100);
           }
         },
@@ -361,7 +450,7 @@
         getPlayerChartData(playerId) {
           const player = this.players.find(p => p.id === playerId);
           if (!player || !player.score) return [];
-          
+
           const cumulativeScores = [];
           let sum = 0;
           for (let score of player.score) {
@@ -384,9 +473,9 @@
           this.score = 0;
           this.game = 0;
           this.initActive = true;
-          
+
           if (this.chart) {
-            this.chart.destroy();
+            this.chart.dispose();
             this.chart = null;
           }
         }
@@ -399,4 +488,5 @@
     }).mount('#app');
   </script>
 </body>
+
 </html>

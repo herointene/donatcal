@@ -2,6 +2,7 @@
 
 測試中
 
+## 2021 
 ## Dec 15
 - 未加CSS，人數暫定4人，無法改名；
 
@@ -10,3 +11,9 @@
 
 ## Dec 29
 - 加入人數4-7，用食物代人名，優化電話界面CSS
+
+## 2025
+## Aug 1
+refactoring
+migrate to ECharts from Chartjs
+new functions: max No. games, winner condition
